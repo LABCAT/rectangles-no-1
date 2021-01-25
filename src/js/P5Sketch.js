@@ -83,7 +83,7 @@ const P5Sketch = () => {
                 }
                 
                 if (currentBeat !== p5.previousBeat) {
-                    p5.amp *= .75;
+                    p5.amp *= .875;
                     p5.previousBeat = currentBeat;
                 }
 
