@@ -1,147 +1,153 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import PlayIcon from './PlayIcon.js';
 import './globals';
 import "p5/lib/addons/p5.sound";
 import * as p5 from "p5";
 import audio from '../audio/rectangles-no-1.mp3'
+import cues from './cues.js'
 
 
 const P5Sketch = () => {
 
-    const Sketch = p5 => {
+    const sketchRef = useRef();
 
-        p5.canvas = null;
+    const Sketch = p => {
 
-        p5.framesPerSecond = 24;
+        p.canvas = null;
 
-        p5.canvasWidth = window.innerWidth;
+        p.canvasWidth = window.innerWidth;
 
-        p5.canvasHeight = window.innerHeight;
+        p.canvasHeight = window.innerHeight;
 
-        p5.centerX = window.innerWidth / 4;
+        p.centerX = window.innerWidth / 4;
 
-        p5.centerY= window.innerHeight / 2;
+        p.centerY= window.innerHeight / 2;
 
-        p5.baseHue = 120;
+        p.baseHue = 120;
 
-        p5.leftSaturation = 25;
+        p.leftSaturation = 25;
         
-        p5.rightSaturation = 75;
+        p.rightSaturation = 75;
 
-        p5.a = 0;
+        p.a = 0;
 
-        p5.b = 0;
+        p.b = 0;
 
-        p5.amp = window.innerWidth / 4;
+        p.amp = window.innerWidth / 4;
         
-        p5.song = null;
+        p.song = null;
 
-        p5.tempo = 101;
-        
-        p5.previousBeat = 0;
+        p.cuesCompleted = [];
 
-        p5.setup = () => {
-            p5.song = p5.loadSound(audio);
-            p5.colorMode(p5.HSL);
-            p5.canvas = p5.createCanvas(p5.canvasWidth, p5.canvasHeight); 
-            p5.background(0,0,94);
-            p5.smooth();
-            p5.noFill();
-            p5.strokeWeight(2);
+        p.setup = () => {
+            p.canvas = p.createCanvas(p.canvasWidth, p.canvasHeight); 
+            p.colorMode(p.HSL);
+            p.background(0,0,94);
+            p.smooth();
+            p.noFill();
+            p.strokeWeight(2);
+
+            p.song = p.loadSound(audio);
+            p.song.onended(p.logCredits);
+            for (let i = 0; i < cues.length; i++) {
+                p.song.addCue(cues[i].time, p.executeCue, (i + 1));
+            }
         };
 
-        p5.draw = () => {
-            let currentBar = p5.getSongBar();
-            let currentBeat = p5.getSongBeat();
-            console.log(currentBar);
+        p.draw = () => {
 
-            if (p5.song._lastPos > 0 && currentBar >= 0 && p5.song.isPlaying()) {
-
-                if (currentBar > 201) {
-                    console.log('Music By: https://github.com/LABCAT');
-                    console.log('Animation By: https://github.com/LABCAT');
-                    console.log('Code Inspiration: https://www.openprocessing.org/sketch/937878');
-                    //p5.song.stop()
-                }
-
-                p5.a = p5.centerX + p5.random(p5.amp) * (180 / p5.TWO_PI);
-                p5.b = p5.centerY + p5.random(p5.amp) * (180 / p5.TWO_PI);
-
-                for (var i = 0; i <= 360; i += .1) {
-
-                    p5.x = p5.centerX - p5.amp * p5.sin(p5.a * i * p5.TWO_PI / 180);
-                    p5.y = p5.centerY - p5.amp * p5.sin(p5.b * i * p5.TWO_PI / 180);
-
-                    p5.stroke(p5.baseHue, 100, p5.leftSaturation, 1);
-                    p5.point(p5.x, p5.y);
-                    p5.point(p5.y, p5.x);
-
-                    p5.stroke(p5.baseHue + 120, 100, p5.rightSaturation, 1);
-                    p5.point(p5.x + (p5.centerX * 2), p5.y);
-                    p5.point(p5.y, p5.x + (p5.centerX * 2));
-
-                }
-                
-                if (currentBeat !== p5.previousBeat) {
-                    p5.amp *= .875;
-                    p5.previousBeat = currentBeat;
-                }
-
-                if (currentBeat % 12 == 0 && currentBar < 24) {
-                    p5.clear();
-                    p5.rotate(p5.TWO_PI / 90);
-                    p5.amp = window.innerWidth / 4;
-                    p5.baseHue = p5.baseHue + 60;
-                    if (p5.baseHue > 360) {
-                        p5.baseHue = p5.baseHue - 360;
-                    }
-                }
+            if (p.song._lastPos > 0 && p.song.isPlaying()) {
                 
             }
           
         };
 
-        p5.beatPerBar = 4;
+        p.executeCue = (currentCue) => {
+            if (!p.cuesCompleted.includes(currentCue)) {
+                p.cuesCompleted.push(currentCue);
 
-        p5.getSongBeat = () => {
-            if (p5.song && p5.song.buffer) {
-                const barAsBufferLength = (p5.song.buffer.sampleRate * 60 / p5.tempo);
-                return Math.floor(p5.song._lastPos / barAsBufferLength) + 1;
+                if (currentCue % 12 === 1 && currentCue > 1) {
+                    p.clear();
+                    p.amp = window.innerWidth / 4;
+                    p.baseHue = p.baseHue + 60;
+                    if (p.baseHue > 360) {
+                        p.baseHue = p.baseHue - 360;
+                    }
+                }
+
+                p.a = p.centerX + p.random(p.amp) * (180 / p.TWO_PI);
+                p.b = p.centerY + p.random(p.amp) * (180 / p.TWO_PI);
+
+                for (var i = 0; i <= 540; i += .1) {
+
+                    p.x = p.centerX - p.amp * p.sin(p.a * i * p.TWO_PI / 180);
+                    p.y = p.centerY - p.amp * p.sin(p.b * i * p.TWO_PI / 180);
+
+                    //left rectangle
+                    p.stroke(p.baseHue, 100, p.leftSaturation, 1);
+                    p.point(p.x, p.y);
+                    p.point(p.y, p.x);
+
+                    //right rectangle
+                    p.stroke(p.baseHue + 120, 100, p.rightSaturation, 1);
+                    p.point(p.x + (p.centerX * 2), p.y);
+                    p.point(p.y, p.x + (p.centerX * 2));
+
+                }
+
+                if (currentCue % 12 !== 11) {
+                    p.amp *= .85;
+                }
             }
-            return -1;
         }
 
-
-        p5.getSongBar = () => {
-            if (p5.song && p5.song.buffer){
-                const barAsBufferLength = (p5.song.buffer.sampleRate * 60 / p5.tempo) * p5.beatPerBar;
-                return Math.floor(p5.song._lastPos / barAsBufferLength) + 1;
-            }
-            return -1;
-        }
-
-        p5.mousePressed = () => {
-            if (p5.song.isPlaying()) {
-                p5.song.pause();
+        p.mousePressed = () => {
+            if (p.song.isPlaying()) {
+                p.song.pause();
             } else {
+                if (parseInt(p.song.currentTime()) >= parseInt(p.song.buffer.duration)) {
+                    p.reset();
+                }
                 document.getElementById("play-icon").classList.add("fade-out");
-                p5.canvas.addClass('fade-in');
-                p5.song.play();
+                p.canvas.addClass('fade-in');
+                p.song.play();
             }
         };
 
-        p5.updateCanvasDimensions = () => {
-            p5.canvasWidth = window.innerWidth;
-            p5.canvasHeight = window.innerHeight;
-            p5.createCanvas(p5.canvasWidth, p5.canvasHeight);
-            p5.redraw();
+        p.creditsLogged = false;
+
+        p.logCredits = () => {
+            if (!p.creditsLogged && parseInt(p.song.currentTime()) >= parseInt(p.song.buffer.duration)) {
+                p.creditsLogged = true;
+                console.log(
+                    'Music By: http://labcat.nz/',
+                    '\n',
+                    'Animation By: https://github.com/LABCAT/rectangles-no-1',
+                    '\n',
+                    'Code Inspiration: https://www.openprocessing.org/sketch/937878'
+                );
+                p.song.stop();
+            }
+        }
+
+        p.reset = () => {
+            p.clear();
+            p.cuesCompleted = [];
+            p.amp = window.innerWidth / 4;
+        };
+
+        p.updateCanvasDimensions = () => {
+            p.canvasWidth = window.innerWidth;
+            p.canvasHeight = window.innerHeight;
+            p.createCanvas(p.canvasWidth, p.canvasHeight);
+            p.redraw();
         }
 
         if (window.attachEvent) {
             window.attachEvent(
                 'onresize',
                 function () {
-                    p5.updateCanvasDimensions();
+                    p.updateCanvasDimensions();
                 }
             );
         }
@@ -149,7 +155,7 @@ const P5Sketch = () => {
             window.addEventListener(
                 'resize',
                 function () {
-                    p5.updateCanvasDimensions();
+                    p.updateCanvasDimensions();
                 },
                 true
             );
@@ -160,14 +166,14 @@ const P5Sketch = () => {
     };
 
     useEffect(() => {
-        new p5(Sketch);
+        new p5(Sketch, sketchRef.current);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
-        <>
+        <div ref={sketchRef}>
             <PlayIcon />
-        </>
+        </div>
     );
 };
 
