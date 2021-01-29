@@ -3,8 +3,11 @@ import PlayIcon from './PlayIcon.js';
 import './globals';
 import "p5/lib/addons/p5.sound";
 import * as p5 from "p5";
-import audio from '../audio/rectangles-no-1.mp3'
-import cues from './cues.js'
+import audio from '../audio/rectangles-no-12.ogg'
+import cueSet1 from './cueSet1.js'
+import cueSet2 from './cueSet2.js'
+import cueSet3 from './cueSet3.js'
+
 
 
 const P5Sketch = () => {
@@ -18,26 +21,26 @@ const P5Sketch = () => {
         p.canvasWidth = window.innerWidth;
 
         p.canvasHeight = window.innerHeight;
-
-        p.centerX = window.innerWidth / 4;
-
-        p.centerY= window.innerHeight / 2;
-
-        p.baseHue = 120;
-
-        p.leftSaturation = 25;
-        
-        p.rightSaturation = 75;
-
-        p.a = 0;
-
-        p.b = 0;
-
-        p.amp = window.innerWidth / 4;
         
         p.song = null;
 
-        p.cuesCompleted = [];
+        p.cueSet1Completed = [];
+
+        p.cueSet2Completed = [];
+        
+        p.cueSet3Completed = [];
+
+        p.centerX = window.innerWidth / 4;
+
+        p.centerY = window.innerHeight / 2;
+
+        p.leftAmp = window.innerWidth / 4;
+        
+        p.rightAmp = window.innerWidth / 4;
+
+        p.baseHue = p.random([60, 120, 180, 240, 300, 360]);
+
+        p.lightnessIndex = 1;
 
         p.setup = () => {
             p.canvas = p.createCanvas(p.canvasWidth, p.canvasHeight); 
@@ -49,8 +52,14 @@ const P5Sketch = () => {
 
             p.song = p.loadSound(audio);
             p.song.onended(p.logCredits);
-            for (let i = 0; i < cues.length; i++) {
-                p.song.addCue(cues[i].time, p.executeCue, (i + 1));
+            for (let i = 0; i < cueSet1.length; i++) {
+                p.song.addCue(cueSet1[i].time, p.executeCueSet1, (i + 1));
+            }
+            for (let i = 0; i < cueSet2.length; i++) {
+                p.song.addCue(cueSet2[i].time, p.executeCueSet2, (i + 1));
+            }
+            for (let i = 0; i < cueSet3.length; i++) {
+                p.song.addCue(cueSet3[i].time, p.executeCueSet3, (i + 1));
             }
         };
 
@@ -62,42 +71,86 @@ const P5Sketch = () => {
           
         };
 
-        p.executeCue = (currentCue) => {
-            if (!p.cuesCompleted.includes(currentCue)) {
-                p.cuesCompleted.push(currentCue);
+        p.executeCueSet1 = (currentCue) => {
+            if (!p.cueSet1Completed.includes(currentCue)) {
+                p.cueSet1Completed.push(currentCue);
 
-                if (currentCue % 12 === 1 && currentCue > 1) {
+                if (currentCue > 1) {
                     p.clear();
-                    p.amp = window.innerWidth / 4;
+                    p.rightAmp = window.innerWidth / 4;
+                    p.leftAmp = window.innerWidth / 4;
+                    p.lightnessIndex = 1;
                     p.baseHue = p.baseHue + 60;
                     if (p.baseHue > 360) {
                         p.baseHue = p.baseHue - 360;
                     }
                 }
+            }
+        }
 
-                p.a = p.centerX + p.random(p.amp) * (180 / p.TWO_PI);
-                p.b = p.centerY + p.random(p.amp) * (180 / p.TWO_PI);
+        p.executeCueSet2 = (currentCue) => {
+            if (!p.cueSet2Completed.includes(currentCue)) {
+                p.cueSet2Completed.push(currentCue);
 
-                for (var i = 0; i <= 540; i += .1) {
 
-                    p.x = p.centerX - p.amp * p.sin(p.a * i * p.TWO_PI / 180);
-                    p.y = p.centerY - p.amp * p.sin(p.b * i * p.TWO_PI / 180);
+                p.rightA = p.centerX + p.random(p.rightAmp) * (180 / p.TWO_PI);
+                p.rightB = p.centerY + p.random(p.rightAmp) * (180 / p.TWO_PI);
+                p.leftA = p.centerX + p.random(p.leftAmp) * (180 / p.TWO_PI);
+                p.leftB = p.centerY + p.random(p.leftAmp) * (180 / p.TWO_PI);
+
+                for (var i = 0; i <= 360; i += .1) {
+
+                    p.rightX = p.centerX - p.rightAmp * p.sin(p.rightA * i * p.TWO_PI / 180) + (p.centerX * 2);
+                    p.rightY = p.centerY - p.rightAmp * p.sin(p.rightB * i * p.TWO_PI / 180);
+                    p.leftX = (p.centerX - p.leftAmp * p.sin(p.leftA * i * p.TWO_PI / 180));
+                    p.leftY = p.centerY - p.leftAmp * p.sin(p.leftB * i * p.TWO_PI / 180);
 
                     //left rectangle
-                    p.stroke(p.baseHue, 100, p.leftSaturation, 1);
-                    p.point(p.x, p.y);
-                    p.point(p.y, p.x);
+                    p.stroke(p.baseHue + 120, 100, 60, 1);
+                    p.point(p.leftX, p.rightY);
+                    p.point(p.rightY, p.leftX);
 
-                    //right rectangle
-                    p.stroke(p.baseHue + 120, 100, p.rightSaturation, 1);
-                    p.point(p.x + (p.centerX * 2), p.y);
-                    p.point(p.y, p.x + (p.centerX * 2));
+                    if (currentCue < 24) {
+                        //right rectangle
+                        p.stroke(p.baseHue, 100, 20, 1);
+                        p.point(p.rightX, p.rightY);
+                        p.point(p.rightY, p.rightX);
+                    }
 
                 }
 
                 if (currentCue % 12 !== 11) {
-                    p.amp *= .85;
+                    p.leftAmp *= .9;
+
+                    if (currentCue < 24) {
+                        p.rightAmp *= .8;
+                    }
                 }
+            }
+        }
+
+        p.executeCueSet3 = (currentCue) => {
+            if (!p.cueSet3Completed.includes(currentCue)) {
+                p.cueSet3Completed.push(currentCue);
+
+                p.rightA = p.centerX + p.random(p.rightAmp) * (180 / p.TWO_PI);
+                p.rightB = p.centerY + p.random(p.rightAmp) * (180 / p.TWO_PI);
+
+                for (var i = 0; i <= 360; i += .1) {
+
+                    p.rightX = p.centerX - p.rightAmp * p.sin(p.rightA * i * p.TWO_PI / 180) + (p.centerX * 2);
+                    p.rightY = p.centerY - p.rightAmp * p.sin(p.rightB * i * p.TWO_PI / 180);
+
+                    //right rectangle
+                    p.stroke(p.baseHue, 100, 80 - (5 * p.lightnessIndex), 1);
+                    p.point(p.rightX, p.rightY);
+                    p.point(p.rightY, p.rightX);
+
+                }
+
+                p.lightnessIndex++;
+                p.rightAmp *= .80;
+                
             }
         }
 
@@ -132,8 +185,12 @@ const P5Sketch = () => {
 
         p.reset = () => {
             p.clear();
-            p.cuesCompleted = [];
-            p.amp = window.innerWidth / 4;
+            p.cueSet1Completed = [];
+            p.cueSet2Completed = [];
+            p.cueSet3Completed = [];
+            p.baseHue = p.random([60, 120, 180, 240, 300, 360]);
+            p.rightAmp = window.innerWidth / 4;
+            p.leftAmp = window.innerWidth / 4;
         };
 
         p.updateCanvasDimensions = () => {

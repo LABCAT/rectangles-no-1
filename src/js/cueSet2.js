@@ -1,4 +1,4 @@
-const cues = [
+const cueSet2 = [
     {
         "duration": 0.5882350000000001,
         "durationTicks": 15360,
@@ -113,7 +113,7 @@ const cues = [
         "midi": 58,
         "name": "A#3",
         "ticks": 184320,
-        "time": 7.058820000000001,
+        "time": 7.128708,
         "velocity": 0.7874015748031497
     },
     {
@@ -221,7 +221,7 @@ const cues = [
         "midi": 55,
         "name": "G3",
         "ticks": 368640,
-        "time": 14.117640000000002,
+        "time": 14.257416,
         "velocity": 0.7874015748031497
     },
     {
@@ -329,7 +329,7 @@ const cues = [
         "midi": 58,
         "name": "A#3",
         "ticks": 552960,
-        "time": 21.176460000000002,
+        "time": 21.386124,
         "velocity": 0.7874015748031497
     },
     {
@@ -437,7 +437,7 @@ const cues = [
         "midi": 55,
         "name": "G3",
         "ticks": 737280,
-        "time": 28.235280000000003,
+        "time": 28.514832,
         "velocity": 0.7874015748031497
     },
     {
@@ -545,7 +545,7 @@ const cues = [
         "midi": 58,
         "name": "A#3",
         "ticks": 921600,
-        "time": 35.2941,
+        "time": 35.64354,
         "velocity": 0.7874015748031497
     },
     {
@@ -653,7 +653,7 @@ const cues = [
         "midi": 55,
         "name": "G3",
         "ticks": 1105920,
-        "time": 42.352920000000005,
+        "time": 42.772248,
         "velocity": 0.7874015748031497
     },
     {
@@ -761,7 +761,7 @@ const cues = [
         "midi": 58,
         "name": "A#3",
         "ticks": 1290240,
-        "time": 49.41174000000001,
+        "time": 49.900956,
         "velocity": 0.7874015748031497
     },
     {
@@ -865,4 +865,4 @@ const cues = [
     }
 ];
 
-export default cues;
+export default cueSet2;
