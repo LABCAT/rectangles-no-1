@@ -3,7 +3,7 @@ import PlayIcon from './PlayIcon.js';
 import './globals';
 import "p5/lib/addons/p5.sound";
 import * as p5 from "p5";
-import audio from '../audio/rectangles-no-12.ogg'
+import audio from '../audio/rectangles-no-1.ogg'
 import cueSet1 from './cueSet1.js'
 import cueSet2 from './cueSet2.js'
 import cueSet3 from './cueSet3.js'
@@ -45,7 +45,6 @@ const P5Sketch = () => {
         p.setup = () => {
             p.canvas = p.createCanvas(p.canvasWidth, p.canvasHeight); 
             p.colorMode(p.HSL);
-            p.background(0,0,94);
             p.smooth();
             p.noFill();
             p.strokeWeight(2);
@@ -65,10 +64,6 @@ const P5Sketch = () => {
 
         p.draw = () => {
 
-            if (p.song._lastPos > 0 && p.song.isPlaying()) {
-                
-            }
-          
         };
 
         p.executeCueSet1 = (currentCue) => {
@@ -92,34 +87,33 @@ const P5Sketch = () => {
             if (!p.cueSet2Completed.includes(currentCue)) {
                 p.cueSet2Completed.push(currentCue);
 
+                if (currentCue % 12 !== 0) {
+                    p.rightA = p.centerX + p.random(p.rightAmp) * (180 / p.TWO_PI);
+                    p.rightB = p.centerY + p.random(p.rightAmp) * (180 / p.TWO_PI);
+                    p.leftA = p.centerX + p.random(p.leftAmp) * (180 / p.TWO_PI);
+                    p.leftB = p.centerY + p.random(p.leftAmp) * (180 / p.TWO_PI);
 
-                p.rightA = p.centerX + p.random(p.rightAmp) * (180 / p.TWO_PI);
-                p.rightB = p.centerY + p.random(p.rightAmp) * (180 / p.TWO_PI);
-                p.leftA = p.centerX + p.random(p.leftAmp) * (180 / p.TWO_PI);
-                p.leftB = p.centerY + p.random(p.leftAmp) * (180 / p.TWO_PI);
+                    for (var i = 0; i <= 360; i += .1) {
 
-                for (var i = 0; i <= 360; i += .1) {
+                        p.rightX = p.centerX - p.rightAmp * p.sin(p.rightA * i * p.TWO_PI / 180) + (p.centerX * 2);
+                        p.rightY = p.centerY - p.rightAmp * p.sin(p.rightB * i * p.TWO_PI / 180);
+                        p.leftX = (p.centerX - p.leftAmp * p.sin(p.leftA * i * p.TWO_PI / 180));
+                        p.leftY = p.centerY - p.leftAmp * p.sin(p.leftB * i * p.TWO_PI / 180);
 
-                    p.rightX = p.centerX - p.rightAmp * p.sin(p.rightA * i * p.TWO_PI / 180) + (p.centerX * 2);
-                    p.rightY = p.centerY - p.rightAmp * p.sin(p.rightB * i * p.TWO_PI / 180);
-                    p.leftX = (p.centerX - p.leftAmp * p.sin(p.leftA * i * p.TWO_PI / 180));
-                    p.leftY = p.centerY - p.leftAmp * p.sin(p.leftB * i * p.TWO_PI / 180);
+                        //left rectangle
+                        p.stroke(p.baseHue + 180, 100, 60, 1);
+                        p.point(p.leftX, p.rightY);
+                        p.point(p.rightY, p.leftX);
 
-                    //left rectangle
-                    p.stroke(p.baseHue + 120, 100, 60, 1);
-                    p.point(p.leftX, p.rightY);
-                    p.point(p.rightY, p.leftX);
+                        if (currentCue < 24) {
+                            //right rectangle
+                            p.stroke(p.baseHue, 100, 20, 1);
+                            p.point(p.rightX, p.rightY);
+                            p.point(p.rightY, p.rightX);
+                        }
 
-                    if (currentCue < 24) {
-                        //right rectangle
-                        p.stroke(p.baseHue, 100, 20, 1);
-                        p.point(p.rightX, p.rightY);
-                        p.point(p.rightY, p.rightX);
                     }
 
-                }
-
-                if (currentCue % 12 !== 11) {
                     p.leftAmp *= .9;
 
                     if (currentCue < 24) {
